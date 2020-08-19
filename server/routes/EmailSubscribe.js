@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const EmailController = require("../controllers/EmailSubscribe");
+const emailController = require("../controllers/EmailSubscribe");
 
-router.post("/emailSubscrib", EmailController.create_email_subscribe);
-router.get("/userDetail", EmailController.userDetail);
+router.post("/emailSubscrib", emailController.create_email_subscribe);
+router.post("/findPosition", emailController.findPosition);
 
 module.exports = router;

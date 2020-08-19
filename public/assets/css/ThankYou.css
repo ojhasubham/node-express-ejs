@@ -3,3 +3,13 @@
     justify-content: center;
     margin: 100px;
 }
+.copyButton{
+cursor: pointer;
+height: 45px;
+width: 45px;
+margin-left: 10px;
+}
+.baseUrl{
+font-size: medium;
+font-size: 30px;
+}

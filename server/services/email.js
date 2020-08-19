@@ -8,20 +8,34 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.SentMailToUser = function (email, position, mailSuccess) {
+exports.sentMailToUser = (email, position) => {
   const mailOptions = {
     from: "subham.works001@gmail.com",
     to: email,
-    subject: "Email For Register",
-    html: `<h1>Your Position at ${position}</h1>`,
+    subject: "Email For Successfully Register",
+    html: `<h3> Thank You For The Registration </h3><br><h3>Your Position Is ${position}</h3>`,
   };
-  transporter.sendMail(mailOptions, function (error, info) {
+  transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log(error);
-      mailSuccess(false);
     } else {
       console.log("Email sent: " + info.response);
-      mailSuccess(true);
+      return { message: "email was sent" };
+    }
+  });
+};
+exports.sentMailToOldUser = (email, positionData) => {
+  const mailOptions = {
+    from: "subham.works001@gmail.com",
+    to: email,
+    subject: "Your New Position Is Set",
+    html: `<h3> Your Old Position Is ${positionData.oldPositon}</h3><br><h3>Your New Position Is ${positionData.newPosition}</h3>`,
+  };
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
       return { message: "email was sent" };
     }
   });

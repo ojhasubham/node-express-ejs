@@ -1,18 +1,18 @@
-const UserData = require("../models/EmailScheema");
+const userData = require("../models/EmailScheema");
 const uniqid = require("uniqid");
 
 const email = require("../services/email");
 exports.create_email_subscribe = async (req, res) => {
-  const checkPosition = await UserData.find({}).catch((err) =>
+
+  await userData.find({ Email: req.body.email }).then((data) => {
+    if (data.length > 0) {
+      return res.json({ status: false, message: "User Already Exist" });
+    }
+  });
+  const checkPosition = await userData.find({}).catch((err) =>
     console.log(err)
   );
   let data;
-  const emailExist = await UserData.find({ Email: req.body.email });
-
-  if (emailExist.length > 0) {
-    return res.json({ status: false, message: "User Already Exist" });
-  }
-
   if (checkPosition.length === 0) {
     data = {
       Email: req.body.email,
@@ -20,35 +20,66 @@ exports.create_email_subscribe = async (req, res) => {
       Code: uniqid(),
     };
   } else {
-    checkPosition.map((item, index) => {
-      if (index === checkPosition.length - 1) {
-        data = {
-          Email: req.body.email,
-          Position: parseInt(item.Position) + 1,
-          Code: uniqid(),
-        };
-      }
-      return;
-    });
+    const maxValue = Math.max(...checkPosition.map((item) => item.Position), 0);
+    data = {
+      Email: req.body.email,
+      Position: parseInt(maxValue) + 1,
+      Code: uniqid(),
+    };
   }
-  UserData.create(data)
+  userData.create(data)
     .then((resData) => {
-      email.SentMailToUser(
-        data.Email,
-        data.Position,
-        (mailSuccess = (isSent) =>
-          isSent
-            ? res
-                .status(200)
-                .json({
-                  status: true,
-                  message: "Your Subscribe Email Sent",
-                  data: data,
-                })
-            : res.status(500).json({ message: "Something Went to wrong" }))
-      );
+      res.status(200).json({
+        status: true,
+        message: "Your Subscribe Email Sent",
+        data: data,
+      });
+      email.sentMailToUser(data.Email, data.Position);
     })
     .catch((err) => console.log(err));
+    if (req.body.referralCode) {
+      await userData.findOne({
+        Code: req.body.referralCode,
+      }).then((data) => {
+        if (data) {
+          if (data.Position > 1) {
+            userData.updateOne(
+              { Code: req.body.referralCode },
+              {
+                $set: {
+                  Position: parseInt(data.Position) - 1,
+                },
+              }
+            ).then((res) => {
+              const positionData = {
+                oldPositon: data.Position,
+                newPosition: data.Position - 1,
+              };
+              email.sentMailToOldUser(data.Email, positionData);
+            });
+          }
+        }
+      });
+    }
 };
 
-exports.userDetail = async (req, res) => {};
+exports.findPosition = async (req, res) => {
+  await userData.findOne({ Email: req.body.email })
+    .then((data) => {
+      if (data) {
+        res.status(200).json({
+          status: true,
+          message: `Your Position is ${data.Position}`,
+          data: data.Position,
+        });
+      } else {
+        res.status(200).json({
+          status: false,
+          message: `User Doesn't Exist `,
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
