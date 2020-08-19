@@ -8,12 +8,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.sentMailToUser = (email, position) => {
+exports.sentMailToUser = (email, position,url) => {
   const mailOptions = {
     from: "subham.works001@gmail.com",
     to: email,
     subject: "Email For Successfully Register",
-    html: `<h3> Thank You For The Registration </h3><br><h3>Your Position Is ${position}</h3>`,
+    html: `<h3> Thank You For The Registration </h3><br><h3>Your Position Is ${position}</h3><br><spam>Your Sharing Url is </spam><a href=${url}>${url}</a>`,
+
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
