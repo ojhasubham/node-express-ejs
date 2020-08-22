@@ -1,9 +1,14 @@
 jQuery(document).ready(() => {
   var base_url = window.location.origin;
   const token = localStorage.getItem("token");
+  const peopleAhead = localStorage.getItem("peopleAhead");
   if (!token) {
     window.location = "/";
   }
+  
+  $("#peopleAhead")
+  .html(`${peopleAhead} People ahead of you`)
+    
   $("#BaseURL")
     .html(`${base_url}/user/${token}`)
     .attr("href", `${base_url}/user/${token}`);
@@ -18,8 +23,9 @@ jQuery(document).ready(() => {
   );
   $("#linkedInBtn").attr(
     "href",
-    `https://www.linkedin.com/shareArticle?url=${`${base_url}/user/${token}`}`
+    `https://www.linkedin.com/shareArticle?mini=true&url=${`${base_url}/user/${token}`}`
   );
+ 
 });
 const copyToClipboard = (element) => {
   var $temp = $("<input>");

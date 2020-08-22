@@ -2,17 +2,19 @@ const express = require("express");
 var path = require("path");
 const app = express();
 const mongoose = require("mongoose");
-const port = 3000;
+const dotenv = require('dotenv');
+dotenv.config();
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 //setup public folder
 app.use(express.static(__dirname + "/public"));
-const email = require("./server/routes/EmailSubscribe");
+app.use('/public', express.static(`${__dirname}/public`, { maxAge: 864000000 }));
+const userRoutes = require("./server/routes/EmailSubscribe");
 const bodyParser = require("body-parser");
 // MongoDB Connection
 mongoose
-  .connect("mongodb://localhost:27017/user", {
+  .connect(`${process.env.MONGODB_URL}`, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -38,15 +40,15 @@ app.use((req, res, next) => {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use("/", email);
+app.use("/", userRoutes);  
 
 app.get("/", (req, res) => {
   res.render("pages/Home");
-});
+});      
 app.get("/user/:id", (req, res) => {
   res.render("pages/Home");
 });
 app.get("/thankyou", (req, res) => {
   res.render("pages/ThankYou");
 });
-app.listen(port, () => console.log(`MasterEJS app Started on port ${port}!`));
+app.listen(`${process.env.PORT}`, () => console.log(`MasterEJS app Started on port ${process.env.PORT}!`));

@@ -1,43 +1,60 @@
-const nodemailer = require("nodemailer");
+const sgMail = require('@sendgrid/mail');
+var handlebars = require('handlebars');
+var fs = require('fs');
+const dirname = process.cwd();
+const url_link = `${process.env.CLIENT_PROTOCOL}://${process.env.CLIENT_HOST}`;
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "subham.works001@gmail.com",
-    pass: "subhamworks@123",
-  },
-});
+handlebars.registerHelper('getObjectKey', function () {
+  let data = this.toString().split(',');
+  return data[0] || '';
+})
 
-exports.sentMailToUser = (email, position,url) => {
-  const mailOptions = {
-    from: "subham.works001@gmail.com",
-    to: email,
-    subject: "Email For Successfully Register",
-    html: `<h3> Thank You For The Registration </h3><br><h3>Your Position Is ${position}</h3><br><spam>Your Sharing Url is </spam><a href=${url}>${url}</a>`,
+handlebars.registerHelper('getObjectValue', function () {
+  let data = this.toString().split(',');
+  return data[1] || '';
+})
 
-  };
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-      return { message: "email was sent" };
-    }
+module.exports.readHTMLFile = (path) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+      if (err) {
+        reject(err);
+      }
+      resolve(html);
+    });
   });
 };
-exports.sentMailToOldUser = (email, positionData) => {
-  const mailOptions = {
-    from: "subham.works001@gmail.com",
-    to: email,
-    subject: "Your New Position Is Set",
-    html: `<h3> Your Old Position Is ${positionData.oldPositon}</h3><br><h3>Your New Position Is ${positionData.newPosition}</h3>`,
-  };
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-      return { message: "email was sent" };
-    }
+
+module.exports.sendEmail = (email,html,replacements,subject) => {
+  return new Promise((resolve, reject) => {
+    let template = handlebars.compile(html);
+    let htmlToSend = template(replacements);
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: email,
+      from: 'contact@witklat.com',
+      subject:subject,
+      html:htmlToSend,
+    };
+    sgMail.send(msg).then((success) => {
+      console.log('Email sent')
+      resolve(success);
+    }).catch((error) => {
+      console.log(error)
+    });
   });
+};
+
+module.exports.sentMailToUser = async (email, position,url) => {
+  const html = await this.readHTMLFile(
+    dirname + '/server/services/template/userVerify.html'
+  );
+  return await this.sendEmail(email,html, {position,url,url_link} ,"Email For Successfully Register");
+};
+
+module.exports.sentMailToOldUser = async (email, positionData) => {
+  const html = await this.readHTMLFile(
+    dirname + '/server/services/template/userReverify.html'
+  );
+  return await this.sendEmail(email,html,{ positionData,url_link},"Your New Position Is Set" );
 };

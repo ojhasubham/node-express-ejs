@@ -1,29 +1,40 @@
 <html>
   <head>
-    <link href="/assets/css/ThankYou.css" rel="stylesheet" type="text/css" />
+    <link href="/public/assets/css/ThankYou.css" rel="stylesheet" type="text/css" />
   </head>
+
   <div class="default-page">
-   <img src="assets/img/Thank-You-for-subscribing.png" alt="thankYou" class="">
+   <h1>Thank you!</h1>
+   <h3>We have added your email address to the register queue</h3>
+   <h1 id="peopleAhead"></h1>
+   <h2>Interested in priority access?</h2>
+   <p>Get early access by referring your friends.The<br>
+    more friends that join.the sooner you'll get access
+  </p>
   </div>
-  <div class="default-page">
-    <a id="BaseURL" class="baseUrl"></a>
-    <img src="assets/img/copy.png" onclick="copyToClipboard('#BaseURL')" alt="copy" class="copyButton" title="copy">
-  </div>
+
   <div class="default-page">
     <a  id="linkedInBtn" rel="external nofollow"  target="_blank" title="Share on LinkedIn" >
       <i class="fab fa-linkedin-in"></i>
     </a>
-
     <a id="twitterBtn"  target="_blank" title="Share on Twitter">
       <i class="fab fa-twitter"></i>
     </a>
-    
     <a id="facebookBtn"  target="_blank" title="Share on Facebook">
       <i class="fab fa-facebook-f" ></i>
     </a>
     
   </div>
+
+  <div class="default-page">
+    <h2>Or share this unique link:</h2>
+    <div class="baseUrlDiv">
+      <a id="BaseURL" class="baseUrl"></a>
+      <img src="assets/img/copy.png" onclick="copyToClipboard('#BaseURL')" alt="copy" class="copyButton" title="copy">
+    </div>
+  </div>
+  
 </html>
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="/assets/js/ThankYou.js"></script>
+<script src="/public/assets/js/ThankYou.js"></script>
