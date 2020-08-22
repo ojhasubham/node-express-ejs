@@ -1,4 +1,4 @@
-const userData = require("../models/EmailScheema");
+const userData = require("../models/EmailSchema");
 const uniqid = require("uniqid");
 const email = require("../services/email");
 const txtService = require('../services/textService');
